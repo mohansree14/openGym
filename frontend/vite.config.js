@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { fileURLToPath } from 'url'
 
 const backend = process.env.API_TARGET || 'http://127.0.0.1:3000'
 const media = process.env.MEDIA_TARGET || 'http://127.0.0.1:8888'
@@ -7,6 +8,10 @@ const media = process.env.MEDIA_TARGET || 'http://127.0.0.1:8888'
 export default defineConfig({
   plugins: [react()],
   base: './',
+  resolve: {
+    // FormTracker only uses the MoveNet runtime; see src/lib/mediapipe-pose-stub.js
+    alias: { '@mediapipe/pose': fileURLToPath(new URL('./src/lib/mediapipe-pose-stub.js', import.meta.url)) }
+  },
   server: {
     proxy: {
       '/api': { target: backend, changeOrigin: true },

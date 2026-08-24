@@ -8,7 +8,11 @@ import { beep, vibrate } from './lib/sound.js'
 import { t, instrFor, getLang, INSTR_LANGS } from './lib/i18n.js'
 import { nav } from './lib/nav.js'
 import { starterRoutines } from './lib/starter.js'
+import { lazy, Suspense } from 'react'
 import Media, { Thumb } from './components/Media.jsx'
+// Pulls in tfjs + the pose model (~1MB+), so it's code-split and only fetched
+// when someone actually opens the form-check sheet.
+const FormTracker = lazy(() => import('./components/FormTracker.jsx'))
 import Stepper from './components/Stepper.jsx'
 import Icon from './components/Icon.jsx'
 import { Button, Slider, Switch, Segmented, SelectRow, Row } from './components/ui.jsx'
@@ -305,6 +309,9 @@ function ExerciseDetail({ ex, close }) {
   </>
 }
 export const exerciseDetailSheet = ex => ui().openSheet(close => <ExerciseDetail ex={ex} close={close} />)
+
+/* ============================ form check (live pose overlay, issue #17) ============================ */
+export const formCheckSheet = () => ui().openSheet(() => <Suspense fallback={<div className="muted">{t('Loading…')}</div>}><FormTracker /></Suspense>)
 
 /* ============================ add to routine ============================ */
 function AddToRoutine({ ex, close }) {
